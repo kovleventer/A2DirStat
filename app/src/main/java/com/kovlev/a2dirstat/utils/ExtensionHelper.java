@@ -4,19 +4,10 @@ import android.graphics.Color;
 
 import org.apache.commons.io.FilenameUtils;
 
-import java.util.Random;
-
+/**
+ * Assigns a color for "most" known extensions
+ */
 public class ExtensionHelper {
-
-    private static Random r = new Random();
-
-    public static int perturbColor(int color) {
-        /*float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[1] += (r.nextDouble()-.5);
-        return Color.HSVToColor(hsv);*/
-        return color;
-    }
 
     public static int getColorFromFileType(String path) {
         switch (FilenameUtils.getExtension(path)) {

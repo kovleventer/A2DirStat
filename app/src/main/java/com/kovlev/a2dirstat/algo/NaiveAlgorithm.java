@@ -4,6 +4,9 @@ import android.graphics.Rect;
 
 import com.kovlev.a2dirstat.view.Box;
 
+/**
+ * Naive algorithm using slice and dice
+ */
 public class NaiveAlgorithm extends Algorithm {
     @Override
     public void calculate(Box box, boolean isHorizontal) {

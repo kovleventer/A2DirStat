@@ -17,9 +17,11 @@ import androidx.fragment.app.Fragment;
 import com.kovlev.a2dirstat.R;
 import com.kovlev.a2dirstat.algo.Algorithm;
 import com.kovlev.a2dirstat.algo.NaiveAlgorithm;
-import com.kovlev.a2dirstat.view.Box;
 import com.kovlev.a2dirstat.view.BoxesView;
 
+/**
+ * Fragment that holds a BoxesView
+ */
 public class BoxesViewFragment extends Fragment {
 
     private BoxesView.OnBoxSelectedListener listener;
@@ -36,7 +38,6 @@ public class BoxesViewFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup parent, @Nullable Bundle savedInstanceState) {
-        // Inflate the xml file for the fragment
         return inflater.inflate(R.layout.fragment_boxes, parent, false);
     }
 
@@ -56,6 +57,8 @@ public class BoxesViewFragment extends Fragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // If permission is granted for reading the filesystem
+        // Otherwise the app will not work (obviously)
         if (requestCode == EXT_STOR_REQ_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 boxesView.initView(algorithm);
@@ -66,8 +69,8 @@ public class BoxesViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof BoxesView.OnBoxSelectedListener){      // context instanceof YourActivity
-            this.listener = (BoxesView.OnBoxSelectedListener) context; // = (YourActivity) context
+        if(context instanceof BoxesView.OnBoxSelectedListener){
+            this.listener = (BoxesView.OnBoxSelectedListener) context;
         } else {
             throw new ClassCastException(context.toString()
                     + " must implement BoxesView.OnBoxSelectedListener");

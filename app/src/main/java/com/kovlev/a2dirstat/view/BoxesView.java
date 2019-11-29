@@ -1,5 +1,6 @@
 package com.kovlev.a2dirstat.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,10 +15,14 @@ import android.view.View;
 import com.kovlev.a2dirstat.algo.Algorithm;
 import com.kovlev.a2dirstat.utils.Point;
 
+/**
+ * Custom view which holds boxes
+ */
 public class BoxesView extends View {
     private Paint paintFill, paintBorder;
     private int width, height;
     private OnBoxSelectedListener onBoxSelectedListener;
+    // Whether the root view has finished size calculation and drawing is safe
     private boolean finishedCalc = false;
 
     public void setOnBoxSelectedListener(OnBoxSelectedListener onBoxSelectedListener) {
@@ -33,6 +38,10 @@ public class BoxesView extends View {
         paintBorder.setStrokeWidth(1);
     }
 
+    /**
+     * Only can be called after filesystem read permissions are granted
+     * @param algorithm The algorithm to calculate rect dimensions with
+     */
     public void initView(Algorithm algorithm) {
         root = new Box(Environment.getExternalStorageDirectory().getAbsolutePath(), this, algorithm);
         System.out.println(Environment.getExternalStorageState());
@@ -46,15 +55,16 @@ public class BoxesView extends View {
         super.onDraw(canvas);
         if (root != null && finishedCalc) {
             root.draw(canvas, paintFill, paintBorder);
-
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         width = w;
         height = h;
         if (root != null) {
+            // Recalculates rect sizes on a different thread
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
@@ -76,6 +86,7 @@ public class BoxesView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Handles box selection events
         Point p = new Point(event.getX(), event.getY());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -103,6 +114,9 @@ public class BoxesView extends View {
         return selected;
     }
 
+    /**
+     * Selected box events are sent to this interface, which should be implemented by the holding activity
+     */
     public interface OnBoxSelectedListener {
         void onBoxSelected(Box box);
     }

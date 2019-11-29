@@ -1,17 +1,7 @@
 package com.kovlev.a2dirstat;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
-
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +10,9 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.kovlev.a2dirstat.algo.Algorithm;
 import com.kovlev.a2dirstat.algo.NaiveAlgorithm;
@@ -42,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Hack to enable file openings with intents
         if(Build.VERSION.SDK_INT>=24){
             try{
                 Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
@@ -59,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    /**
+     * Creates fragments as needed
+     * One if the orientation is portrait
+     * Two if landscape
+     */
     private void initFragments() {
 
         BoxesViewFragment firstFragment = new BoxesViewFragment();
@@ -80,21 +78,21 @@ public class MainActivity extends AppCompatActivity implements
     public void onBoxSelected(Box box) {
         DetailsFragment secondFragment = new DetailsFragment();
 
+        // Communication using arguments
         Bundle args = new Bundle();
         args.putString("item", box.getFile().toString());
-        secondFragment.setArguments(args);          // (1) Communicate with Fragment using Bundle
+        secondFragment.setArguments(args);
 
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.flContainer2, secondFragment) // replace flContainer
-                    //.addToBackStack(null)
+                    .replace(R.id.flContainer2, secondFragment)
                     .commit();
         }else{
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.flContainer, secondFragment) // replace flContainer
+                    .replace(R.id.flContainer, secondFragment)
                     .addToBackStack(null)
                     .commit();
         }
@@ -111,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings_id:
+                // Show settings
                 Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(startSettingsActivity);
                 return true;
@@ -132,6 +131,10 @@ public class MainActivity extends AppCompatActivity implements
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    /**
+     * Updates the algorithm from sharedpreferences
+     * @param sp The SharedPreferences to read from
+     */
     private void setAlgorithm(SharedPreferences sp) {
         String algoString = sp.getString(getString(R.string.key_algo), "Naive");
         String[] algos = getResources().getStringArray(R.array.algos);

@@ -9,6 +9,9 @@ import androidx.annotation.Nullable;
 
 import com.kovlev.a2dirstat.R;
 
+/**
+ * Fragment to help handling preferences
+ */
 public class SettingsFragment extends PreferenceFragment {
 
     @Override

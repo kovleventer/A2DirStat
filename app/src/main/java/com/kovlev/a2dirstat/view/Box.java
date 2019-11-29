@@ -15,24 +15,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Represents a Box, which is az entry (folder or file) in the directory structure
+ */
 public class Box {
-    public File getFile() {
-        return file;
-    }
-
     private File file;
-
-    public Rect getView() {
-        return view;
-    }
-
-    public List<Box> getChildren() {
-        return children;
-    }
-
-    public long getSize() {
-        return size;
-    }
 
     private Rect view = new Rect(0,0,0,0);
 
@@ -43,7 +30,6 @@ public class Box {
     private BoxesView container;
 
     private Algorithm algorithm;
-
 
     public Box(String path, BoxesView container, Algorithm algorithm) {
         this.file = new File(path);
@@ -57,6 +43,12 @@ public class Box {
         this.algorithm = algorithm;
     }
 
+    /**
+     * Calculates the total size of the entry (file or folder)
+     * To do this, this method creates new Box classes and registers them as their children, then calls
+     *      totalSize() on them
+     * @return The total size in bytes
+     */
     public long totalSize() {
         if (file.isFile()) {
             size = file.length();
@@ -73,19 +65,36 @@ public class Box {
         }
     }
 
+    /**
+     * Calculates the rectangles based on the sizes of the boxes and its children
+     * @param parent The parent rectangle, which this box can use and further subdivide
+     */
     public void calculate(Rect parent) {
         calculate(parent, true);
     }
 
+    /**
+     * Helper function for calculation
+     * @param parent The parent rectangle
+     * @param isHorizontal Whether the screen has a width greater than its height
+     */
     public void calculate(Rect parent, boolean isHorizontal) {
         view = parent;
         algorithm.calculate(this, isHorizontal);
 
     }
 
+    /**
+     * Draws a box
+     * If it is a file, draws a colorful rectangle
+     * Else calls draw() recursively on its children
+     * @param canvas The canvas to draw to
+     * @param paintFill Used to draw filled colored rects
+     * @param paintBorder Used to draw borders
+     */
     public void draw(Canvas canvas, Paint paintFill, Paint paintBorder) {
         if (file.isFile()) {
-            paintFill.setColor(ExtensionHelper.perturbColor(ExtensionHelper.getColorFromFileType(file.getAbsolutePath())));
+            paintFill.setColor(ExtensionHelper.getColorFromFileType(file.getAbsolutePath()));
 
             if (container.getSelected() == this) {
                 paintFill.setColor(Color.WHITE);
@@ -99,6 +108,13 @@ public class Box {
         }
     }
 
+    /**
+     * Retrieves the box at a given point (for selection)
+     * Since multiple boxes can occupy the same spot (a file, and all its parent directories)
+     *      only the box corresponding to a file will be returned
+     * @param p The touched point
+     * @return The box at the given point
+     */
     public Box getBoxAtPoint(Point p) {
         if (file.isFile()) return this;
         for (Box child : children) {
@@ -107,5 +123,23 @@ public class Box {
             }
         }
         return null;
+    }
+
+    // Getters
+
+    public File getFile() {
+        return file;
+    }
+
+    public Rect getView() {
+        return view;
+    }
+
+    public List<Box> getChildren() {
+        return children;
+    }
+
+    public long getSize() {
+        return size;
     }
 }

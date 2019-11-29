@@ -1,30 +1,26 @@
 package com.kovlev.a2dirstat.fragments;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.kovlev.a2dirstat.R;
-import com.kovlev.a2dirstat.utils.ExtensionHelper;
-
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Fragment displaying the details of a single file
+ */
 public class DetailsFragment extends Fragment {
 
     private TextView tvName, tvSize, tvModified;
@@ -39,10 +35,9 @@ public class DetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState == null){
-            // Get back arguments
+            // A string argument was passed by the creating activity to indicate which file to display information about
             if(getArguments() != null) {
                 file = new File(getArguments().getString("item", ""));
-
             }
         }
     }
@@ -52,7 +47,8 @@ public class DetailsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_details, parent, false);
     }
 
-    // from https://stackoverflow.com/questions/6265298/action-view-intent-for-a-file-with-unknown-mimetype/6381479
+    // From https://stackoverflow.com/questions/6265298/action-view-intent-for-a-file-with-unknown-mimetype/6381479
+    // And unnecessarily complicated method for opening a file with any extensions
     public void openFile(File url) {
 
         Uri uri = Uri.fromFile(url);
@@ -92,16 +88,11 @@ public class DetailsFragment extends Fragment {
             // Video files
             intent.setDataAndType(uri, "video/*");
         } else {
-            //if you want you can also define the intent type for any other file
-            //additionally use else clause below, to manage other unknown extensions
-            //in this case, Android will show all applications installed on the device
-            //so you can choose which application to use
             intent.setDataAndType(uri, "*/*");
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
-
     }
 
 
@@ -113,7 +104,7 @@ public class DetailsFragment extends Fragment {
         tvModified = view.findViewById(R.id.tvModified);
 
         if (file != null) {
-
+            // Showing information about the file
             tvName.setText(file.getAbsolutePath());
             tvSize.setText(NumberFormat.getIntegerInstance().format(file.length()) + " " + getString(R.string.bytes));
             tvModified.setText(sdf.format(new Date(file.lastModified())));

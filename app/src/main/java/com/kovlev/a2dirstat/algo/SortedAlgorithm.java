@@ -7,6 +7,9 @@ import com.kovlev.a2dirstat.view.Box;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Slightly modified verion of the naive algorithm, sorts the folders before placing them
+ */
 public class SortedAlgorithm extends Algorithm {
     @Override
     public void calculate(Box box, boolean isHorizontal) {

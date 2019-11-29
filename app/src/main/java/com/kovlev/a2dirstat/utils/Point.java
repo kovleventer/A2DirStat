@@ -1,5 +1,8 @@
 package com.kovlev.a2dirstat.utils;
 
+/**
+ * Simple 2D point with float coordinates
+ */
 public class Point {
     private float x;
 
