@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">A2DirStat</string>
+    <string name="name">Name</string>
+    <string name="size">Size</string>
+    <string name="modified">Modified</string>
+    <string name="open">Open</string>
+    <string name="bytes">bytes</string>
+    <string name="settings">Settings</string>
+    <string name="key_algo" translatable="false">algo</string>
+    <string name="label_algos">Algorithms</string>
 </resources>

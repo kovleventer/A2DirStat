@@ -1,17 +1,38 @@
 package com.kovlev.a2dirstat.view;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.kovlev.a2dirstat.algo.Algorithm;
 import com.kovlev.a2dirstat.utils.ExtensionHelper;
+import com.kovlev.a2dirstat.utils.Point;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Box {
+    public File getFile() {
+        return file;
+    }
+
     private File file;
+
+    public Rect getView() {
+        return view;
+    }
+
+    public List<Box> getChildren() {
+        return children;
+    }
+
+    public long getSize() {
+        return size;
+    }
 
     private Rect view = new Rect(0,0,0,0);
 
@@ -19,13 +40,21 @@ public class Box {
 
     private long size;
 
+    private BoxesView container;
 
-    public Box(String path) {
+    private Algorithm algorithm;
+
+
+    public Box(String path, BoxesView container, Algorithm algorithm) {
         this.file = new File(path);
+        this.container = container;
+        this.algorithm = algorithm;
     }
 
-    public Box(File f) {
+    public Box(File f, BoxesView container, Algorithm algorithm) {
         file = f;
+        this.container = container;
+        this.algorithm = algorithm;
     }
 
     public long totalSize() {
@@ -36,7 +65,7 @@ public class Box {
             File[] subentries = file.listFiles();
             size = 0;
             for (File entry : subentries) {
-                Box b = new Box(entry);
+                Box b = new Box(entry, container, algorithm);
                 children.add(b);
                 size += b.totalSize();
             }
@@ -50,30 +79,33 @@ public class Box {
 
     public void calculate(Rect parent, boolean isHorizontal) {
         view = parent;
-        long len = isHorizontal ? parent.width() : parent.height();
-        double increment = (double)len/size;
-        double acc = 0;
-        for (Box b : children) {
-            double incAcc = acc + b.size * increment;
-            if (isHorizontal) {
-                b.calculate(new Rect(parent.left + (int) acc, parent.top,
-                        parent.left + (int) incAcc, parent.bottom), false);
-            } else {
-                b.calculate(new Rect(parent.left, parent.top + (int) acc,
-                        parent.right, parent.top + (int) incAcc), true);
+        algorithm.calculate(this, isHorizontal);
+
+    }
+
+    public void draw(Canvas canvas, Paint paintFill, Paint paintBorder) {
+        if (file.isFile()) {
+            paintFill.setColor(ExtensionHelper.perturbColor(ExtensionHelper.getColorFromFileType(file.getAbsolutePath())));
+
+            if (container.getSelected() == this) {
+                paintFill.setColor(Color.WHITE);
             }
-            acc = incAcc;
+            canvas.drawRect(view, paintFill);
+            canvas.drawRect(view, paintBorder);
+        } else {
+            for (Box b : children) {
+                b.draw(canvas, paintFill, paintBorder);
+            }
         }
     }
 
-    public void draw(Canvas canvas, Paint paint) {
-        if (file.isFile()) {
-            paint.setColor(ExtensionHelper.perturbColor(ExtensionHelper.getColorFromFileType(file.getAbsolutePath())));
-            canvas.drawRect(view, paint);
-        } else {
-            for (Box b : children) {
-                b.draw(canvas, paint);
+    public Box getBoxAtPoint(Point p) {
+        if (file.isFile()) return this;
+        for (Box child : children) {
+            if (child.view.contains((int)p.getX(), (int)p.getY())) {
+                return child.getBoxAtPoint(p);
             }
         }
+        return null;
     }
 }

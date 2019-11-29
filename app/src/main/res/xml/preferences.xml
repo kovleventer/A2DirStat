@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/algos"
+        android:entryValues="@array/algos"
+        android:key="@string/key_algo"
+        android:title="@string/label_algos" />
+</PreferenceScreen>

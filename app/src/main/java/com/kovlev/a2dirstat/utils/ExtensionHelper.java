@@ -11,6 +11,10 @@ public class ExtensionHelper {
     private static Random r = new Random();
 
     public static int perturbColor(int color) {
+        /*float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[1] += (r.nextDouble()-.5);
+        return Color.HSVToColor(hsv);*/
         return color;
     }
 
@@ -27,6 +31,15 @@ public class ExtensionHelper {
                 return Color.GREEN;
             case "csv":
                 return Color.MAGENTA;
+            case "pdf":
+                return Color.YELLOW;
+            case "rar":
+            case "zip":
+            case "7z":
+                return Color.DKGRAY;
+            case "mp4":
+            case "webm":
+                return Color.CYAN;
             default:
                 return Color.GRAY;
         }
